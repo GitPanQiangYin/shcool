@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzuli.mapper.AdminMapper">
+
+	<!-- 根据类别代码查询数据 -->
+	<insert id="addAdmin" parameterType="com.zzuli.pojo.Admin" >
+	INSERT INTO admin(admin.username,admin.password,admin.email) VALUES (#{username},#{password},#{email})
+	</insert>
+	
+	<select id="login" parameterType="String" resultType="com.zzuli.pojo.Admin">
+	SELECT * FROM admin WHERE email=#{email} AND password=#{password}
+	</select>
+	
+	<select id="searchAllUsers" resultType="int">
+	SELECT COUNT(1) FROM users
+	</select> 
+	
+	<resultMap type="com.zzuli.pojo.Users" id="resultmap"></resultMap>
+	<select id="searchUsersByPage" resultMap="resultmap">
+	SELECT * FROM users limit #{startPos},#{pageSize} 
+	</select>
+	
+	<select id="searchAllAssignment" resultType="int">
+	SELECT COUNT(1) FROM assignment
+	</select>
+	
+	<resultMap type="com.zzuli.pojo.Assignment" id="resultmap1"></resultMap>
+	<select id="searchAssignmentByPage" resultMap="resultmap1">
+	SELECT * FROM assignment limit #{startPos},#{pageSize} 
+	</select>
+	
+	<select id="searchLowCreditUsers" resultType="int">
+	SELECT COUNT(1) FROM users Where credit&lt;90
+	</select>
+	
+	<resultMap type="com.zzuli.pojo.Users" id="resultmap2"></resultMap>
+	<select id="searchLowCreditUsersByPage" resultMap="resultmap2">
+	SELECT * FROM users WHERE credit&lt;90 limit #{startPos},#{pageSize} 
+	</select>
+	
+	<select id="searchBannedUsers" resultType="int">
+	SELECT COUNT(1) FROM users Where status="被封"
+	</select>
+	<resultMap type="com.zzuli.pojo.Users" id="resultmap3"></resultMap>
+	<select id="searchBannedUsersByPage" resultMap="resultmap3">
+	SELECT * FROM users Where status="封停" limit #{startPos},#{pageSize} 
+	</select>
+	
+	<select id="queryWarningAssignment" resultType="int">
+	SELECT COUNT(1) FROM assignment Where status="请修改"
+	</select>
+	<resultMap type="com.zzuli.pojo.Assignment" id="resultmap4"></resultMap>
+	<select id="queryWarningAssignmentByPage" resultMap="resultmap4">
+	SELECT * FROM assignment Where status="请修改" limit #{startPos},#{pageSize} 
+	</select>
+	
+	<update id="banUser" parameterType="int">
+	UPDATE users SET status="封停",reason="账号存在异常操作" WHERE user_id=#{user_id}
+	</update>
+	<update id="pleaseChangeInfo" parameterType="com.zzuli.pojo.Users">
+	UPDATE users SET status="请修改信息",reason=#{reason} WHERE user_id=#{user_id}
+	</update>
+	
+	<insert id="sendWarningMessage" parameterType="com.zzuli.pojo.Message">
+	INSERT INTO message(message.message_name,message.sender_id,message.receiver_id,message.message_detail) VALUES(#{message_name},#{sender_id},#{receiver_id},#{message_detail})
+	</insert>
+	
+	<select id="searchPleaseChangeUsers" resultType="int">
+	SELECT COUNT(1) FROM users Where status="请修改信息"
+	</select>
+	<resultMap type="com.zzuli.pojo.Users" id="resultmap6"></resultMap>
+	<select id="searchPleaseChangeUsersByPage" resultMap="resultmap6">
+	SELECT * FROM users Where status="请修改信息" limit #{startPos},#{pageSize}
+	</select>
+	
+	<insert id="sendMessage" parameterType="com.zzuli.pojo.Message">
+	INSERT INTO message(message.message_name,message.sender_id,message.receiver_id,message.message_detail) VALUES(#{message_name},#{sender_id},#{receiver_id},#{message_detail})
+	</insert>
+	
+	<select id="queryAssignmentById" parameterType="int" resultType="com.zzuli.pojo.Assignment">
+	SELECT * FROM assignment WHERE assignment_id=#{assignment_id}
+	</select>
+	<update id="repealAssignmentById" parameterType="com.zzuli.pojo.Assignment">
+	UPDATE assignment SET status="已下架",reason=#{reason} WHERE assignment_id=#{assignment_id}
+	</update>
+	<insert id="sendMessageOfRepealAssignment" parameterType="com.zzuli.pojo.Message">
+	INSERT INTO message(message.message_name,message.sender_id,message.receiver_id,message.message_detail,message.assignment_id) VALUES(#{message_name},#{sender_id},#{receiver_id},#{message_detail},#{assignment_id})
+	</insert>
+	
+	
+	<select id="searchRepealedAssignment" resultType="int">
+	SELECT COUNT(1) FROM assignment Where status="已下架"
+	</select>
+	<resultMap type="com.zzuli.pojo.Assignment" id="resultmap5"></resultMap>
+	<select id="queryRepealedAssignmentByPage" resultMap="resultmap5">
+	SELECT * FROM assignment Where status="已下架" limit #{startPos},#{pageSize} 
+	</select>
+	
+	<update id="deblockUser" parameterType="int">
+	UPDATE users SET status="正常",reason="" WHERE user_id=#{user_id}
+	</update>
+</mapper>

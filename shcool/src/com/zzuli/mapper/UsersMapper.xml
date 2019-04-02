@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzuli.mapper.UsersMapper">
+
+	<!-- 根据类别代码查询数据 -->
+	
+	<insert id="addUser" parameterType="com.zzuli.pojo.Users" >
+	INSERT INTO  users (users.gender,users.user_name,users.phone,users.address,users.school,users.email,users.password) VALUES (#{gender},#{user_name},#{phone},#{address},#{school},#{email},#{password});
+	</insert>
+	
+	<select id="login" parameterType="String" resultType="com.zzuli.pojo.Users">
+		SELECT * FROM users WHERE email=#{email} AND password=#{password}
+	</select>
+	<select id="checkEmail" parameterType="String" resultType="com.zzuli.pojo.Users">
+		SELECT * FROM users WHERE email=#{email}
+	</select>
+	
+	<resultMap type="com.zzuli.pojo.Assignment" id="resultmap"></resultMap>
+<!-- 	<select id="MyAssignment" parameterType="int" resultMap="resultmap">
+	SELECT * FROM assignment WHERE promulgator_id=#{user_id}
+	</select> -->
+	
+	<resultMap type="com.zzuli.pojo.Assignment" id="resultmap1"></resultMap>
+	<select id="MyReceiveAssignment" parameterType="int" resultMap="resultmap1">
+	SELECT * FROM assignment WHERE receiver_id=#{user_id}
+	</select>
+	
+	<update id="DeductMoney" parameterType="com.zzuli.pojo.Assignment" >
+		UPDATE users SET money=(money-#{brokerage}) WHERE user_id=#{promulgator_id}
+	</update>
+	
+	<update id="AddMoney" parameterType="com.zzuli.pojo.Assignment" >
+		UPDATE users SET money=(money+#{brokerage}) WHERE user_id=#{receiver_id}
+	</update>
+	
+	<select id="SearchAssignment" parameterType="int" resultType="int">
+		SELECT COUNT(1) FROM assignment WHERE receiver_id=#{receiver_id}
+	</select>
+	
+	<select id="SearchCredit" parameterType="int" resultType="int">
+	SELECT users.credit FROM users WHERE user_id=#{receiver_id}
+	</select>
+	
+	<update id="ReduceCredit" parameterType="int" >	
+	UPDATE users SET credit=(#{credit}-3) WHERE user_id=#{receiver_id}
+	</update>
+	
+	<select id="SearchPersonInfo" parameterType="int" resultType="com.zzuli.pojo.Users" >
+	SELECT * FROM users WHERE user_id=#{user_id}
+	</select>
+	
+	<update id="ChangePassword" >
+	UPDATE users SET `password`=#{password} WHERE user_id=#{user_id}
+	</update>
+	
+	<select id="messageCount" parameterType="int" resultType="int">
+	SELECT COUNT(1) FROM message WHERE receiver_id=#{user_id} AND status="未读"
+	</select>
+	
+	<update id="changePersonInfo" parameterType="com.zzuli.pojo.Users">
+	UPDATE users SET users.gender=#{gender},users.school=#{school},users.address=#{address},users.phone=#{phone},users.user_name=#{user_name} WHERE user_id=#{user_id}
+	</update>
+	
+	<select id="MyAssignment" parameterType="int" resultType="int">
+	SELECT COUNT(1) FROM assignment WHERE promulgator_id=#{user_id}
+	</select>
+
+	<select id="MyAssignmentByPage" parameterType="int" resultMap="resultmap1">
+	SELECT * FROM assignment WHERE promulgator_id=#{user_id} limit #{startPos},#{pageSize}
+	</select>
+	
+	<select id="canceledAssignment" parameterType="int" resultType="int">
+	SELECT COUNT(1) FROM assignment WHERE promulgator_id=#{user_id} AND `status`="已下架"
+	</select>
+	<select id="canceledAssignmentByPage" parameterType="int" resultMap="resultmap1">
+	SELECT * FROM assignment WHERE promulgator_id=#{user_id} AND `status`="已下架" limit #{startPos},#{pageSize}
+	</select>
+	
+	<resultMap type="com.zzuli.pojo.Message" id="resultmap3"></resultMap>
+	<select id="myReceiveMessageByPage" parameterType="int" resultMap="resultmap3">
+	SELECT * FROM message WHERE receiver_id=#{user_id} AND `status`="未读" limit #{startPos},#{pageSize}
+	</select>
+	
+	<select id="queryMessageById" parameterType="int" resultType="com.zzuli.pojo.Message">
+	SELECT * FROM message WHERE message_id=#{message_id}
+	</select>
+	
+	<update id="signMessage" parameterType="int">
+	UPDATE message SET status="已读" WHERE message_id=#{message_id}
+	</update>
+	<select id="queryMyFinishedAssignment" parameterType="int" resultType="int">
+	SELECT COUNT(1) FROM assignment WHERE (promulgator_id=#{user_id} OR receiver_id=#{user_id}) AND `status`="已完成"
+	</select>
+	<select id="queryMyFinishedAssignmentByPage" parameterType="int" resultMap="resultmap1">
+	SELECT * FROM assignment WHERE (promulgator_id=#{user_id} OR receiver_id=#{user_id}) AND `status`="已完成"
+	</select>
+	
+	<update id="publishComment" parameterType="com.zzuli.pojo.Comment">
+	INSERT INTO comment (comment.assignment_id,comment.promulgator_id,comment.comment_detail) VALUES (#{assignment_id},#{promulgator_id},#{comment_detail})
+	</update>
+</mapper>
